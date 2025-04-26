@@ -3,7 +3,6 @@ package bot
 import (
 	"context"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
 	commands "tg-bot/internal/commands"
 	user "tg-bot/internal/user"
 	"time"
@@ -22,7 +21,6 @@ func MainController(updates tgbotapi.UpdatesChannel, bot *TgBot, stopChan <-chan
 				message := update.Message.Text
 				go handleMessage(message, chatID, bot)
 			}
-
 		case <-stopChan:
 			return
 		}
@@ -30,38 +28,37 @@ func MainController(updates tgbotapi.UpdatesChannel, bot *TgBot, stopChan <-chan
 }
 
 func handleCommand(username string, cmd string, chatID int64, bot *TgBot) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
-	if command, exists := commands.CommandRegistry[cmd]; exists {
-		commandCtx := commands.CommandContext{ChatId: chatID, Username: username}
-		messageForUser := make(chan string)
-
-		if cmd == "help" {
-			botCmds, err := bot.GetBotCommand() // не работает
-			if err != nil {
-				log.Println(err.Error())
-				commandCtx.BotCmd = nil
-			} else {
-				commandCtx.BotCmd = botCmds
-			}
-		}
-
-		go func() {
-			msg := command.Execute(commandCtx)
-			messageForUser <- msg
-		}()
-
-		select {
-		case msg := <-messageForUser:
-			bot.SendMessage(chatID, msg)
-		case <-ctx.Done():
-			bot.SendMessage(chatID, "Команда заняла слишком много времени, попробуйте еще раз!")
-		}
-
-	} else {
+	var command commands.Command
+	var exists bool
+	if command, exists = commands.CommandRegistry[cmd]; !exists {
 		bot.SendMessage(chatID, "Неизвестная команда! Воспользуйтесь /help")
 	}
+	commandCtx := commands.CommandContext{ChatId: chatID, Username: username}
+	messageForUser := make(chan string)
+
+	if cmd == "help" {
+		botCmds, err := bot.GetBotCommand()
+		if err != nil {
+			commandCtx.BotCmd = nil
+		} else {
+			commandCtx.BotCmd = botCmds
+		}
+	}
+
+	go func() {
+		msg := command.Execute(commandCtx)
+		messageForUser <- msg
+	}()
+
+	select {
+	case msg := <-messageForUser:
+		bot.SendMessage(chatID, msg)
+	case <-ctx.Done():
+		bot.SendMessage(chatID, "Команда заняла слишком много времени, попробуйте еще раз!")
+	}
+
 }
 
 func handleMessage(message string, chatID int64, bot *TgBot) {

@@ -1,9 +1,17 @@
 package commands
 
 import (
-	"log"
 	"tg-bot/internal/network"
 	. "tg-bot/internal/user"
+)
+
+var (
+	trackMessages = map[int]string{
+		2:   "Ошибка! Действие Команды отменено",
+		400: "Ошибка со стороны клиента: попробуйте еще раз!",
+		409: "Такого пользователя не существует, сначала зарегистрируйтесь -> /start !",
+		500: "Ошибка со стороны сервера: попробуйте еще раз!",
+		200: "Ссылка успешно добавлена!"}
 )
 
 type TrackCommand struct{}
@@ -12,17 +20,16 @@ func (cmd *TrackCommand) Execute(ctx CommandContext) string {
 	mu.Lock()
 	defer mu.Unlock()
 
-	user, ok := Users[ctx.ChatId]
-	if !ok {
-		log.Printf("[TrackCommand.Execute] пользователь не найден в Users")
-		return "Сначала зарегистрируйтесь -> /start"
+	if !network.CheckUser(ctx.ChatId) {
+		return listMessages[409]
 	}
 
+	user, _ := Users[ctx.ChatId]
 	state := user.State
 
 	if ctx.Message == "" && state != NONE {
 		ResetState(ctx.ChatId)
-		return "Ошибка! Действие Команды отменено"
+		return trackMessages[2]
 	}
 
 	stmf := AddStates[state]
@@ -34,11 +41,11 @@ func (cmd *TrackCommand) Execute(ctx CommandContext) string {
 	user.State = stmf.NextState
 
 	if state == WaitingHashtag {
-		err := network.AddLinkRequest(ctx.ChatId, user.Link, user.Category, user.Filter)
+		code, err := network.AddLinkRequest(ctx.ChatId, user.Link, user.Category)
 		if err != nil {
-			log.Printf("[TrackCommand.Execute] ошибка при добавлении ссылки: %v", err)
-			return "Не удалось добавить ссылку, попробуйте снова"
+			return startMessages[400]
 		}
+		return trackMessages[int(code)]
 	}
 
 	return stmf.Message

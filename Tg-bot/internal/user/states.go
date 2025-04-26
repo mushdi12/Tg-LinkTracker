@@ -4,7 +4,6 @@ const (
 	ERROR = iota
 	NONE  = iota
 	WaitingUrl
-	WaitingFilter
 	WaitingHashtag
 	WaitingUrlForRemove
 )
@@ -18,8 +17,7 @@ type StateAction struct {
 var (
 	AddStates = map[int]StateAction{
 		NONE:           {NextState: WaitingUrl, Message: "Пришлите мне ссылку:", FieldtoChange: ""},
-		WaitingUrl:     {NextState: WaitingFilter, Message: "Придумайте фильтр для ссылки:", FieldtoChange: "Link"},
-		WaitingFilter:  {NextState: WaitingHashtag, Message: "Назовите категорию ссылки:", FieldtoChange: "Filter"},
+		WaitingUrl:     {NextState: WaitingHashtag, Message: "Назовите категорию ссылки:", FieldtoChange: "Link"},
 		WaitingHashtag: {NextState: NONE, Message: "Ссылка успешно сохранена!", FieldtoChange: "Category"}}
 
 	RemoveStates = map[int]StateAction{

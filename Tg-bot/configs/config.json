@@ -1,0 +1,26 @@
+{
+  "token": "8016405887:AAH07Ec8ii3ME08tTd1kE3PeqjysFZk1_gE",
+  "commands": [
+    {
+      "command": "start",
+      "description": "Зарегистрироваться"
+    },
+    {
+      "command": "help",
+      "description": "Вывести список доступных команд"
+    },
+    {
+      "command": "track",
+      "description": "Начать отслеживание ссылки"
+    },
+    {
+      "command": "untrack",
+      "description": "Прекратить отслеживание ссылки"
+    },
+    {
+      "command": "list",
+      "description": "Вывести список отслеживаемых ссылок"
+    }
+  ],
+  "server_url": "http://localhost:8080/user/"
+}

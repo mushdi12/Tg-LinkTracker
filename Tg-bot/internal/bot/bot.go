@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"os"
@@ -28,27 +27,27 @@ func NewTgBot(filePath string) *TgBot {
 
 	config, err := fileManager.LoadConfig(filePath)
 	if err != nil {
-		log.Fatal("<<internal/bot/NewTgBot>> Failed to load config: ", err)
+		log.Fatal("Failed to load config: ", err)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
-		log.Fatal("<<internal/bot/NewTgBot>> Telegram token is empty")
+		log.Fatal("Telegram token is empty")
 	}
 
 	botCommands, err := fileManager.CommandConverter(config.Commands)
 	if err != nil {
-		log.Fatal("<<internal/bot/NewTgBot>> Failed to convert commands: ", err)
+		log.Fatal("Failed to convert commands: ", err)
 	}
 
 	setCommands := tgbotapi.NewSetMyCommands(botCommands...)
 	_, err = bot.Request(setCommands)
 	if err != nil {
-		log.Fatal("<<internal/bot/NewTgBot>> Failed to set commands: ", err)
+		log.Fatal("Failed to set commands: ", err)
 	}
 
 	if config.ServerURL == "" {
-		log.Fatal("<<internal/bot/NewTgBot>> Server URL is empty")
+		log.Fatal("Server URL is empty")
 	}
 
 	network.ServerURL = config.ServerURL
@@ -80,6 +79,7 @@ func (bot *TgBot) Start() {
 
 func (bot *TgBot) SendMessage(chatId int64, message string) {
 	msg := tgbotapi.NewMessage(chatId, message)
+	msg.ParseMode = tgbotapi.ModeMarkdown
 	msg.DisableWebPagePreview = true
 	_, err := bot.Send(msg)
 	if err != nil {
@@ -96,7 +96,6 @@ func (bot *TgBot) Stop() {
 }
 
 func (bot *TgBot) GetBotCommand() ([]tgbotapi.BotCommand, error) {
-	fmt.Println("GetBotCommand")
 	commands, err := bot.GetMyCommands()
 	if err != nil {
 		return nil, err

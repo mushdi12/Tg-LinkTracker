@@ -1,0 +1,38 @@
+{
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/users",
+      "description": "Создание нового пользователя",
+      "request_body": {
+        "chatID": "integer",
+        "username": "string"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/users/{userID}/links",
+      "description": "Добавление ссылки для пользователя",
+      "request_body": {
+        "url": "string"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/links/{linkID}",
+      "description": "Удаление ссылки по ID",
+      "request_params": {
+        "linkID": "integer"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/{userID}/links/{linkID}",
+      "description": "Удаление ссылки для конкретного пользователя по его ID и ID ссылки",
+      "request_params": {
+        "userID": "integer",
+        "linkID": "integer"
+      }
+    }
+  ]
+}

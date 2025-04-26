@@ -3,22 +3,32 @@ package server
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	. "server-scrapper/internal/network"
+	"server-scrapper/internal/server/handlers/addLink"
+	"server-scrapper/internal/server/handlers/addUser"
+	"server-scrapper/internal/server/handlers/getLinks"
+	"server-scrapper/internal/server/handlers/removeLink"
+	"server-scrapper/internal/server/handlers/userExist"
+	"server-scrapper/internal/server/middlewares"
+	"server-scrapper/internal/storage/postgres"
 )
 
 type Server struct {
 	*echo.Echo
 }
 
-func NewServer() *Server {
+func New(storage *postgres.Storage) *Server {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover()) // для восстановления из паники
+	e.Use(middleware.Recover())
 
-	e.POST("user/addUser", AddUserHandler)
-	e.POST("user/addLink", AddLinkHandler)
-	e.GET("user/getLinks", GetLinksHandler)
-	e.DELETE("user/removeLink", RemoveLinkHandler)
-	return &Server{e}
+	server := &Server{Echo: e}
+
+	e.POST("user/addUser", addUser.Handler(storage), middlewares.ExtractUserAndCheck(storage))
+	e.POST("user/isExist", userExist.Handler(storage), middlewares.ExtractUser(storage))
+	e.POST("user/addLink", addLink.Handler(storage), middlewares.ExtractLink(storage))
+	e.GET("/user/getLinks", getLinks.Handler(storage), middlewares.ExtractChatIdAndChecke(storage))
+	e.DELETE("user/removeLink", removeLink.Handler(storage), middlewares.ExtractChatIdLinkAndCheck(storage))
+
+	return server
 }

@@ -1,0 +1,40 @@
+CREATE TABLE users
+(
+    chat_id  BIGINT PRIMARY KEY,
+    username TEXT NOT NULL,
+    reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE users_links
+(
+    link_id     SERIAL PRIMARY KEY,
+    chat_id     BIGINT NOT NULL,
+    url         TEXT   NOT NULL,
+    category    TEXT   NOT NULL,
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_chat_id FOREIGN KEY (chat_id) REFERENCES users (chat_id) ON DELETE CASCADE,
+    CONSTRAINT unique_user_url UNIQUE (chat_id, url)
+);
+
+CREATE TABLE watched_repos
+(
+    id          SERIAL PRIMARY KEY,
+    chat_id     BIGINT NOT NULL,
+    repo_owner  TEXT   NOT NULL,
+    repo_name   TEXT   NOT NULL,
+    last_sha    TEXT,
+    last_issue  INT,
+    last_pr     INT,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_watched_chat_id FOREIGN KEY (chat_id) REFERENCES users(chat_id) ON DELETE CASCADE,
+    CONSTRAINT unique_watched_repo UNIQUE (chat_id, repo_owner, repo_name)
+);
+
+
+
+CREATE INDEX idx_user_links_chat_id ON users_links (chat_id);
+CREATE INDEX idx_user_links_category ON users_links (category);
+CREATE INDEX idx_user_links_create_date ON users_links (create_date);
+

@@ -6,15 +6,21 @@ import (
 	"os"
 )
 
+type KafkaConfig struct {
+	Brokers []string `json:"brokers"`
+	Topic   string   `json:"topic"`
+}
+
 type BotCommand struct {
 	Command     string `json:"command"`
 	Description string `json:"description"`
 }
 
 type Config struct {
-	Token     string       `json:"token"`
-	Commands  []BotCommand `json:"commands"`
-	ServerURL string       `json:"server_url"`
+	Token       string       `json:"token"`
+	Commands    []BotCommand `json:"commands"`
+	ServerURL   string       `json:"server_url"`
+	KafkaConfig KafkaConfig  `json:"kafka"`
 }
 
 func MustLoad(configPath string) *Config {

@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"server-scrapper/internal/config"
 	"server-scrapper/internal/lib/github"
-	"server-scrapper/internal/lib/telegram"
+	"server-scrapper/internal/lib/kafka"
 	"server-scrapper/internal/server"
 	"server-scrapper/internal/storage/postgres"
 	"server-scrapper/internal/watcher"
@@ -26,7 +26,7 @@ type App struct {
 func New(cfg *config.Config) *App {
 
 	storage := postgres.New(cfg.StorageData)
-	tgClient := telegram.New(cfg.TelegramBot)
+	tgClient := kafka.New(cfg.Kafka)
 	gitClient := github.New()
 	watcher := watcher.New(storage, tgClient, gitClient, cfg.Watcher)
 	server := server.New(storage, gitClient)

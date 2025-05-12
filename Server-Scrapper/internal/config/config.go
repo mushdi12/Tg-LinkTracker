@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	StorageData string      `json:"storage_data"`
-	TelegramBot TelegramBot `json:"telegram_bot"`
-	Watcher     Watcher     `json:"watcher"`
+	StorageData string  `json:"storage_data"`
+	Kafka       Kafka   `json:"kafka"`
+	Watcher     Watcher `json:"watcher"`
 }
-type TelegramBot struct {
-	URL string `json:"url"`
+type Kafka struct {
+	Brokers []string `json:"brokers"`
+	Topic   string   `json:"topic"`
 }
 
 type Watcher struct {

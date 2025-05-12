@@ -7,8 +7,8 @@ import (
 	"log"
 	"server-scrapper/internal/config"
 	"server-scrapper/internal/lib/github"
+	"server-scrapper/internal/lib/kafka"
 	"server-scrapper/internal/lib/repositories"
-	"server-scrapper/internal/lib/telegram"
 	"server-scrapper/internal/storage/postgres"
 	"time"
 )
@@ -16,13 +16,13 @@ import (
 type Watcher struct {
 	*gocron.Scheduler
 	storage   *postgres.Storage
-	tgClient  *telegram.Telegram
+	tgClient  *kafka.Kafka
 	gitClient *github.GitHub
 	interval  int
 	count     int
 }
 
-func New(storage *postgres.Storage, tgClient *telegram.Telegram, gitClient *github.GitHub, cfg config.Watcher) *Watcher {
+func New(storage *postgres.Storage, tgClient *kafka.Kafka, gitClient *github.GitHub, cfg config.Watcher) *Watcher {
 	watcher := &Watcher{
 		Scheduler: gocron.NewScheduler(time.UTC),
 		storage:   storage,

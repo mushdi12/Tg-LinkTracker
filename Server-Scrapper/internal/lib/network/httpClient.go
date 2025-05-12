@@ -32,7 +32,6 @@ func (httpClient *HttpClient) MakeGetRequest(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	// GitHub требует заголовок User-Agent
 	req.Header.Set("User-Agent", "go-github-watcher")
 
 	resp, err := httpClient.Do(req)

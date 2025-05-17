@@ -1,7 +1,7 @@
 # Tg-LinkTracker
 
 **Tg-LinkTracker** — это Telegram-бот и серверный скраппер, предназначенные для отслеживания и анализа ссылок GitHub в Telegram. Проект реализован на языке Go и 
-использует Docker для контейнеризации компонентов. Ссылка на тг-бота: [t.me/Mushdi12_LinkTracker_bot](t.me/Mushdi12_LinkTracker_bot)
+использует Docker для контейнеризации компонентов. Ссылка на тг-бота: [Перейти к Telegram-боту](t.me/Mushdi12_LinkTracker_bot)
 
 _Стек приложения:_
 - Go - язык на котором написаны все сервисы.
